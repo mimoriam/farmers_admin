@@ -1,3 +1,4 @@
+import 'package:farmers_admin/common/app_header.dart';
 import 'package:farmers_admin/constants/constants.dart' as appColors;
 import 'package:farmers_admin/main.dart';
 import 'package:farmers_admin/screens/user_management/user_screen.dart';
@@ -24,85 +25,6 @@ class ContentPage extends StatelessWidget {
 class DashboardContent extends StatelessWidget {
   const DashboardContent({super.key});
 
-  // Helper method to build the top header, now fully responsive
-  Widget _buildHeader(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // On very narrow screens, we might want to simplify even more,
-        // but for now, we'll focus on hiding the name.
-        bool isNarrow = constraints.maxWidth < 500;
-
-        return Row(
-          children: [
-            // This spacer will push the icons to the right
-            const Spacer(),
-
-            // Notification Icon with a badge
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_none_outlined, color: Colors.grey),
-                  onPressed: () {},
-                  splashRadius: 20,
-                ),
-                Positioned(
-                  right: 12,
-                  top: 12,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    constraints: const BoxConstraints(
-                      minWidth: 8,
-                      minHeight: 8,
-                    ),
-                  ),
-                )
-              ],
-            ),
-            const SizedBox(width: 8),
-            // Email Icon
-            IconButton(
-              icon: const Icon(Icons.email_outlined, color: Colors.grey),
-              onPressed: () {},
-              splashRadius: 20,
-            ),
-            const SizedBox(width: 16),
-            // User Profile Section
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    radius: 14,
-                    backgroundColor: Colors.blueGrey,
-                    child: Text('DA', style: TextStyle(fontSize: 12, color: Colors.white)),
-                  ),
-                  // Conditionally show the name based on screen width
-                  if (!isNarrow) ...[
-                    const SizedBox(width: 8),
-                    Text(
-                      'Derek Alvarado',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: Colors.black),
-                    ),
-                  ],
-                  const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
-                ],
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final appColors = Theme.of(context).extension<AppColors>()!;
@@ -112,15 +34,14 @@ class DashboardContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // This is the new responsive header
-          _buildHeader(context),
+          AppHeader(),
           const SizedBox(height: 30),
 
           Text(
             'Dashboard',
-            style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
@@ -165,11 +86,7 @@ class DashboardContent extends StatelessWidget {
               ];
 
               if (constraints.maxWidth < breakpoint) {
-                return Wrap(
-                  spacing: 20.0,
-                  runSpacing: 20.0,
-                  children: cards,
-                );
+                return Wrap(spacing: 20.0, runSpacing: 20.0, children: cards);
               } else {
                 return Row(
                   children: cards.map((card) {
@@ -187,10 +104,9 @@ class DashboardContent extends StatelessWidget {
           const SizedBox(height: 30),
           Text(
             'Pending Requests',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.black,
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 20),
           const Expanded(child: RequestsGrid()),
@@ -199,6 +115,7 @@ class DashboardContent extends StatelessWidget {
     );
   }
 }
+
 // --- Summary Card Widget ---
 class SummaryCard extends StatelessWidget {
   final String title, value, percentage;
@@ -253,7 +170,6 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
-
 class RequestsGrid extends StatefulWidget {
   const RequestsGrid({super.key});
 
@@ -277,14 +193,16 @@ class _RequestsGridState extends State<RequestsGrid> {
   final List<PlutoRow> rows = List.generate(50, (index) {
     final id = index + 1;
     final status = id % 3 == 0 ? 'Blocked' : 'Approved';
-    return PlutoRow(cells: {
-      'id': PlutoCell(value: id),
-      'name': PlutoCell(value: 'User Name $id'),
-      'email': PlutoCell(value: 'user$id@example.com'),
-      'dob': PlutoCell(value: '01/01/1990'),
-      'status': PlutoCell(value: status),
-      'actions': PlutoCell(value: ''),
-    });
+    return PlutoRow(
+      cells: {
+        'id': PlutoCell(value: id),
+        'name': PlutoCell(value: 'User Name $id'),
+        'email': PlutoCell(value: 'user$id@example.com'),
+        'dob': PlutoCell(value: '01/01/1990'),
+        'status': PlutoCell(value: status),
+        'actions': PlutoCell(value: ''),
+      },
+    );
   });
 
   final List<PlutoColumn> columns = [
@@ -318,11 +236,7 @@ class _RequestsGridState extends State<RequestsGrid> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: Text(
-                rendererContext.cell.value,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
+              child: Text(rendererContext.cell.value, overflow: TextOverflow.ellipsis, maxLines: 1),
             ),
           ],
         );
@@ -369,7 +283,7 @@ class _RequestsGridState extends State<RequestsGrid> {
             rows: rows,
             onLoaded: (PlutoGridOnLoadedEvent event) {
               stateManager = event.stateManager;
-              stateManager.setPageSize(10, notify: false); // Set page size
+              stateManager.setPageSize(9, notify: false); // Set page size
             },
             configuration: PlutoGridConfiguration(
               columnSize: const PlutoGridColumnSizeConfig(
@@ -384,7 +298,7 @@ class _RequestsGridState extends State<RequestsGrid> {
               ),
             ),
             createFooter: (stateManager) {
-              stateManager.setPageSize(10, notify: false);
+              // stateManager.setPageSize(9, notify: false);
               return PlutoPagination(stateManager);
             },
           ),
@@ -393,6 +307,7 @@ class _RequestsGridState extends State<RequestsGrid> {
     );
   }
 }
+
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
