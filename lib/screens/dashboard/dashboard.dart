@@ -1,5 +1,6 @@
 import 'package:farmers_admin/constants/constants.dart' as appColors;
 import 'package:farmers_admin/main.dart';
+import 'package:farmers_admin/screens/user_management/user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
@@ -397,7 +398,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardContent(),
-    ContentPage(title: 'Customers'),
+    UserManagementScreen(),
     ContentPage(title: 'Analytics'),
     ContentPage(title: 'Posts'),
     ContentPage(title: 'Messages'),
