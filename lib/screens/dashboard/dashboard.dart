@@ -1,6 +1,7 @@
 import 'package:farmers_admin/common/app_header.dart';
 import 'package:farmers_admin/constants/constants.dart' as appColors;
 import 'package:farmers_admin/main.dart';
+import 'package:farmers_admin/screens/post_management/post_management_screen.dart';
 import 'package:farmers_admin/screens/user_management/user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
@@ -298,7 +299,7 @@ class _RequestsGridState extends State<RequestsGrid> {
               ),
             ),
             createFooter: (stateManager) {
-              // stateManager.setPageSize(9, notify: false);
+              stateManager.setPageSize(9, notify: false);
               return PlutoPagination(stateManager);
             },
           ),
@@ -315,7 +316,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     DashboardContent(),
     UserManagementScreen(),
     ContentPage(title: 'Analytics'),
-    ContentPage(title: 'Posts'),
+    PostManagementScreen(),
     ContentPage(title: 'Messages'),
     ContentPage(title: 'Settings'),
     ContentPage(title: 'Help Centre'),

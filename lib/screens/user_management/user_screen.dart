@@ -136,6 +136,50 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
         'actions': PlutoCell(value: ''),
       },
     ),
+
+    PlutoRow(
+      cells: {
+        'id': PlutoCell(value: 12),
+        'name': PlutoCell(value: 'Jane Smith'),
+        'email': PlutoCell(value: 'jane.smith@email.com'),
+        'dob': PlutoCell(value: '05/20/1985'),
+        'status': PlutoCell(value: 'Inactive'),
+        'actions': PlutoCell(value: ''),
+      },
+    ),
+
+    PlutoRow(
+      cells: {
+        'id': PlutoCell(value: 12),
+        'name': PlutoCell(value: 'Jane Smith'),
+        'email': PlutoCell(value: 'jane.smith@email.com'),
+        'dob': PlutoCell(value: '05/20/1985'),
+        'status': PlutoCell(value: 'Inactive'),
+        'actions': PlutoCell(value: ''),
+      },
+    ),
+
+    PlutoRow(
+      cells: {
+        'id': PlutoCell(value: 12),
+        'name': PlutoCell(value: 'Jane Smith'),
+        'email': PlutoCell(value: 'jane.smith@email.com'),
+        'dob': PlutoCell(value: '05/20/1985'),
+        'status': PlutoCell(value: 'Inactive'),
+        'actions': PlutoCell(value: ''),
+      },
+    ),
+
+    PlutoRow(
+      cells: {
+        'id': PlutoCell(value: 12),
+        'name': PlutoCell(value: 'Jane Smith'),
+        'email': PlutoCell(value: 'jane.smith@email.com'),
+        'dob': PlutoCell(value: '05/20/1985'),
+        'status': PlutoCell(value: 'Inactive'),
+        'actions': PlutoCell(value: ''),
+      },
+    ),
   ];
 
   final List<PlutoColumn> columns = [
@@ -223,6 +267,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          AppHeader(),
           Text(
             'User Management',
             style: Theme.of(
@@ -339,7 +384,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
               rows: rows,
               onLoaded: (PlutoGridOnLoadedEvent event) {
                 stateManager = event.stateManager;
-                stateManager.setPageSize(14, notify: true);
+                stateManager.setPageSize(10, notify: true);
               },
               configuration: PlutoGridConfiguration(
                 columnSize: const PlutoGridColumnSizeConfig(autoSizeMode: PlutoAutoSizeMode.scale),
@@ -351,6 +396,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 ),
               ),
               createFooter: (stateManager) {
+                stateManager.setPageSize(12, notify: true);
                 return PlutoPagination(stateManager);
               },
             ),
