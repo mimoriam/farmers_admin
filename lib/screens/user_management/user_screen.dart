@@ -1,6 +1,8 @@
 import 'package:farmers_admin/common/app_header.dart';
 import 'package:farmers_admin/main.dart';
+import 'package:farmers_admin/screens/add_user/edit_user_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 import '../../constants/constants.dart' as appColors;
@@ -14,6 +16,83 @@ class UserManagementScreen extends StatefulWidget {
 
 class _UserManagementScreenState extends State<UserManagementScreen> {
   late final PlutoGridStateManager stateManager;
+
+  void showDeleteConfirmationDialog(String postId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.priority_high_rounded, color: Colors.red, size: 40),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Warning",
+                style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Are you sure you want to delete?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: Icon(Icons.cancel_outlined, color: Colors.red),
+                      label: Text("Cancel", style: TextStyle(color: Colors.red)),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.red),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.delete_outline, color: Colors.white),
+                      label: Text("Delete", style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () async {
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+
+                        if (mounted) {
+                          setState(() {}); // Refresh the list
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   final List<PlutoRow> rows = [
     PlutoRow(
@@ -182,82 +261,98 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
     ),
   ];
 
-  final List<PlutoColumn> columns = [
-    PlutoColumn(
-      title: '#',
-      field: 'id',
-      type: PlutoColumnType.number(),
-      width: 80,
-      enableSorting: false,
-    ),
-    PlutoColumn(title: 'Full Name', field: 'name', type: PlutoColumnType.text()),
-    PlutoColumn(title: 'E-Mail', field: 'email', type: PlutoColumnType.text()),
-    PlutoColumn(
-      title: 'Date of Birth',
-      field: 'dob',
-      type: PlutoColumnType.date(format: 'MM/dd/yyyy'),
-    ),
-    PlutoColumn(
-      title: 'Status',
-      field: 'status',
-      type: PlutoColumnType.text(),
-      minWidth: 115,
-      renderer: (rendererContext) {
-        Color statusColor;
-        switch (rendererContext.cell.value) {
-          case 'Active':
-            statusColor = Colors.green;
-            break;
-          case 'Inactive':
-            statusColor = Colors.orange;
-            break;
-          case 'Deactivated':
-            statusColor = Colors.red;
-            break;
-          default:
-            statusColor = Colors.grey;
-        }
-        return Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(rendererContext.cell.value, overflow: TextOverflow.ellipsis, maxLines: 1),
-            ),
-          ],
-        );
-      },
-    ),
-    PlutoColumn(
-      title: 'Actions',
-      field: 'actions',
-      type: PlutoColumnType.text(),
-      width: 150,
-      minWidth: 150,
-      enableSorting: false,
-      renderer: (rendererContext) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.open_in_new, size: 20),
-              onPressed: () {},
-              splashRadius: 20,
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20),
-              onPressed: () {},
-              splashRadius: 20,
-            ),
-          ],
-        );
-      },
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    columns = [
+      PlutoColumn(
+        title: '#',
+        field: 'id',
+        type: PlutoColumnType.number(),
+        width: 80,
+        enableSorting: false,
+      ),
+      PlutoColumn(title: 'Full Name', field: 'name', type: PlutoColumnType.text()),
+      PlutoColumn(title: 'E-Mail', field: 'email', type: PlutoColumnType.text()),
+      PlutoColumn(
+        title: 'Date of Birth',
+        field: 'dob',
+        type: PlutoColumnType.date(format: 'MM/dd/yyyy'),
+      ),
+      PlutoColumn(
+        title: 'Status',
+        field: 'status',
+        type: PlutoColumnType.text(),
+        minWidth: 115,
+        renderer: (rendererContext) {
+          Color statusColor;
+          switch (rendererContext.cell.value) {
+            case 'Active':
+              statusColor = Colors.green;
+              break;
+            case 'Inactive':
+              statusColor = Colors.orange;
+              break;
+            case 'Deactivated':
+              statusColor = Colors.red;
+              break;
+            default:
+              statusColor = Colors.grey;
+          }
+          return Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  rendererContext.cell.value,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+      PlutoColumn(
+        title: 'Actions',
+        field: 'actions',
+        type: PlutoColumnType.text(),
+        width: 150,
+        minWidth: 150,
+        enableSorting: false,
+        renderer: (rendererContext) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.open_in_new, size: 20),
+                onPressed: () {
+                  Navigator.of(
+                    context,
+                  ).push(MaterialPageRoute(builder: (context) => const EditUserScreen()));
+                },
+                splashRadius: 20,
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 20),
+                onPressed: () {
+                  showDeleteConfirmationDialog("1");
+                },
+                splashRadius: 20,
+              ),
+            ],
+          );
+        },
+      ),
+    ];
+  }
+
+  late List<PlutoColumn> columns;
 
   @override
   Widget build(BuildContext context) {
