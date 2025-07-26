@@ -4,6 +4,7 @@ import 'package:farmers_admin/main.dart';
 import 'package:farmers_admin/screens/post_management/post_management_screen.dart';
 import 'package:farmers_admin/screens/user_management/user_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -171,6 +172,8 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
+
+
 class RequestsGrid extends StatefulWidget {
   const RequestsGrid({super.key});
 
@@ -206,73 +209,233 @@ class _RequestsGridState extends State<RequestsGrid> {
     );
   });
 
-  final List<PlutoColumn> columns = [
-    PlutoColumn(
-      title: '#',
-      field: 'id',
-      type: PlutoColumnType.number(),
-      width: 80,
-      enableSorting: false,
-    ),
-    PlutoColumn(title: 'Full Name', field: 'name', type: PlutoColumnType.text()),
-    PlutoColumn(title: 'E-Mail', field: 'email', type: PlutoColumnType.text()),
-    PlutoColumn(
-      title: 'Date of Birth',
-      field: 'dob',
-      type: PlutoColumnType.date(format: 'MM/dd/yyyy'),
-    ),
-    PlutoColumn(
-      title: 'Status',
-      field: 'status',
-      type: PlutoColumnType.text(),
-      minWidth: 115,
-      renderer: (rendererContext) {
-        Color statusColor = rendererContext.cell.value == 'Approved' ? Colors.green : Colors.grey;
-        return Row(
-          children: [
-            Container(
-              width: 8,
-              height: 8,
-              decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(rendererContext.cell.value, overflow: TextOverflow.ellipsis, maxLines: 1),
-            ),
-          ],
+  late final List<PlutoColumn> columns;
+
+  void showDeleteConfirmationDialog(String postId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.priority_high_rounded, color: Colors.red, size: 40),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Warning",
+                style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Are you sure you want to delete?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: Icon(Icons.cancel_outlined, color: Colors.red),
+                      label: Text("Cancel", style: TextStyle(color: Colors.red)),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.red),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.delete_outline, color: Colors.white),
+                      label: Text("Delete", style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () async {
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+
+                        if (mounted) {
+                          setState(() {}); // Refresh the list
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
-    ),
-    PlutoColumn(
-      title: 'Actions',
-      field: 'actions',
-      type: PlutoColumnType.text(),
-      width: 100,
-      minWidth: 50,
-      enableSorting: false,
-      renderer: (rendererContext) {
-        return Wrap(
-          alignment: WrapAlignment.center,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit_outlined, size: 20),
-              onPressed: () {},
-              splashRadius: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              constraints: const BoxConstraints(),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline, size: 20),
-              onPressed: () {},
-              splashRadius: 20,
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              constraints: const BoxConstraints(),
-            ),
-          ],
-        );
-      },
-    ),
-  ];
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 2. Initialize the list inside initState where 'this' is available.
+    columns = [
+      PlutoColumn(
+        title: '#',
+        field: 'id',
+        type: PlutoColumnType.number(),
+        width: 80,
+        enableSorting: false,
+      ),
+      PlutoColumn(title: 'Full Name', field: 'name', type: PlutoColumnType.text()),
+      PlutoColumn(title: 'E-Mail', field: 'email', type: PlutoColumnType.text()),
+      PlutoColumn(
+        title: 'Date of Birth',
+        field: 'dob',
+        type: PlutoColumnType.date(format: 'MM/dd/yyyy'),
+      ),
+      PlutoColumn(
+        title: 'Status',
+        field: 'status',
+        type: PlutoColumnType.text(),
+        minWidth: 115,
+        renderer: (rendererContext) {
+          Color statusColor = rendererContext.cell.value == 'Approved' ? Colors.green : Colors.grey;
+          return Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(rendererContext.cell.value, overflow: TextOverflow.ellipsis, maxLines: 1),
+              ),
+            ],
+          );
+        },
+      ),
+      PlutoColumn(
+        title: 'Actions',
+        field: 'actions',
+        type: PlutoColumnType.text(),
+        width: 150,
+        minWidth: 150,
+        enableSorting: false,
+        renderer: (rendererContext) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit_outlined, size: 20),
+                onPressed: () {},
+                splashRadius: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                constraints: const BoxConstraints(),
+              ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 20),
+                // This call is now valid!
+                onPressed: () {
+                  showDeleteConfirmationDialog("1");
+                },
+                splashRadius: 20,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                constraints: const BoxConstraints(),
+              ),
+            ],
+          );
+        },
+      ),
+    ];
+  }
+
+
+  // List<PlutoColumn> columns = [
+  //   PlutoColumn(
+  //     title: '#',
+  //     field: 'id',
+  //     type: PlutoColumnType.number(),
+  //     width: 80,
+  //     enableSorting: false,
+  //   ),
+  //   PlutoColumn(title: 'Full Name', field: 'name', type: PlutoColumnType.text()),
+  //   PlutoColumn(title: 'E-Mail', field: 'email', type: PlutoColumnType.text()),
+  //   PlutoColumn(
+  //     title: 'Date of Birth',
+  //     field: 'dob',
+  //     type: PlutoColumnType.date(format: 'MM/dd/yyyy'),
+  //   ),
+  //   PlutoColumn(
+  //     title: 'Status',
+  //     field: 'status',
+  //     type: PlutoColumnType.text(),
+  //     minWidth: 115,
+  //     renderer: (rendererContext) {
+  //       Color statusColor = rendererContext.cell.value == 'Approved' ? Colors.green : Colors.grey;
+  //       return Row(
+  //         children: [
+  //           Container(
+  //             width: 8,
+  //             height: 8,
+  //             decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
+  //           ),
+  //           const SizedBox(width: 8),
+  //           Expanded(
+  //             child: Text(rendererContext.cell.value, overflow: TextOverflow.ellipsis, maxLines: 1),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   ),
+  //   PlutoColumn(
+  //     title: 'Actions',
+  //     field: 'actions',
+  //     type: PlutoColumnType.text(),
+  //     width: 150,
+  //     minWidth: 150,
+  //     enableSorting: false,
+  //     renderer: (rendererContext) {
+  //       return Row(
+  //         // alignment: WrapAlignment.center,
+  //         mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //         children: [
+  //           IconButton(
+  //             icon: const Icon(Icons.edit_outlined, size: 20),
+  //             onPressed: () {},
+  //             splashRadius: 20,
+  //             padding: const EdgeInsets.symmetric(horizontal: 4),
+  //             constraints: const BoxConstraints(),
+  //           ),
+  //           IconButton(
+  //             icon: const Icon(Icons.delete_outline, size: 20),
+  //             onPressed: () {
+  //               showDeleteConfirmationDialog("1");
+  //             },
+  //             splashRadius: 20,
+  //             padding: const EdgeInsets.symmetric(horizontal: 4),
+  //             constraints: const BoxConstraints(),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   ),
+  // ];
 
   @override
   Widget build(BuildContext context) {

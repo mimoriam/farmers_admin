@@ -1,6 +1,7 @@
 import 'package:farmers_admin/common/app_header.dart';
 import 'package:farmers_admin/screens/edit_post/edit_post_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 import '../../main.dart';
@@ -14,6 +15,83 @@ class PostManagementScreen extends StatefulWidget {
 
 class _PostManagementScreenState extends State<PostManagementScreen> {
   late final PlutoGridStateManager stateManager;
+
+  void showDeleteConfirmationDialog(String postId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.priority_high_rounded, color: Colors.red, size: 40),
+              ),
+              SizedBox(height: 20),
+              Text(
+                "Warning",
+                style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
+              ),
+              SizedBox(height: 8),
+              Text(
+                "Are you sure you want to delete?",
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
+              ),
+              SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: Icon(Icons.cancel_outlined, color: Colors.red),
+                      label: Text("Cancel", style: TextStyle(color: Colors.red)),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.red),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      icon: Icon(Icons.delete_outline, color: Colors.white),
+                      label: Text("Delete", style: TextStyle(color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+                        padding: EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () async {
+                        if (context.mounted) {
+                          Navigator.of(context).pop();
+                        }
+
+                        if (mounted) {
+                          setState(() {}); // Refresh the list
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   List<PlutoColumn> _getColumns(BuildContext context) {
     return [
@@ -105,7 +183,9 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
               ),
               IconButton(
                 icon: const Icon(Icons.delete_outline, size: 20),
-                onPressed: () {},
+                onPressed: () {
+                  showDeleteConfirmationDialog("1");
+                },
                 splashRadius: 20,
               ),
             ],
