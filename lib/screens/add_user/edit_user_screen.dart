@@ -20,7 +20,7 @@ class _EditUserScreenState extends State<EditUserScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const AppHeader(),
+              // const AppHeader(),
               const _Header(),
               const SizedBox(height: 20),
               Card(
@@ -187,20 +187,20 @@ class _ImageUploader extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        SizedBox(
-          width: double.infinity,
-          child: OutlinedButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.file_upload_outlined, color: Colors.black),
-            label: const Text('UPLOAD PHOTO', style: TextStyle(color: Colors.black)),
-            style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-              side: BorderSide(color: Colors.grey[300]!),
-            ),
-          ),
-        ),
+        // SizedBox(
+        //   width: double.infinity,
+        //   child: OutlinedButton.icon(
+        //     onPressed: () {},
+        //     icon: const Icon(Icons.file_upload_outlined, color: Colors.black),
+        //     label: const Text('UPLOAD PHOTO', style: TextStyle(color: Colors.black)),
+        //     style: OutlinedButton.styleFrom(
+        //       padding: const EdgeInsets.symmetric(vertical: 16),
+        //       backgroundColor: Colors.white,
+        //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        //       side: BorderSide(color: Colors.grey[300]!),
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }

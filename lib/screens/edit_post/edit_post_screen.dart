@@ -20,7 +20,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              AppHeader(),
+              // AppHeader(),
               _Header(),
               const SizedBox(height: 20),
               // Re-introduced the Card for the main content area

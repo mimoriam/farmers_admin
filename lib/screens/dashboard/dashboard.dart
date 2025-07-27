@@ -6,6 +6,7 @@ import 'package:farmers_admin/screens/user_management/user_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pluto_grid/pluto_grid.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -30,89 +31,95 @@ class DashboardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = Theme.of(context).extension<AppColors>()!;
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // This is the new responsive header
-          AppHeader(),
-          const SizedBox(height: 30),
-
-          Text(
-            'Dashboard',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Dashboard / Customers\' List',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey),
-          ),
-          const SizedBox(height: 30),
-          // Responsive Summary Cards
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const double breakpoint = 900.0;
-
-              final List<Widget> cards = [
-                SummaryCard(
-                  title: 'Views',
-                  value: '721K',
-                  percentage: '+11.01%',
-                  isPositive: true,
-                  backgroundColor: appColors.cardBackgroundColor!,
-                ),
-                SummaryCard(
-                  title: 'Visits',
-                  value: '367K',
-                  percentage: '-0.03%',
-                  isPositive: false,
-                  backgroundColor: appColors.cardBackgroundColor2!,
-                ),
-                SummaryCard(
-                  title: 'New Users',
-                  value: '1,156',
-                  percentage: '+15.03%',
-                  isPositive: true,
-                  backgroundColor: appColors.cardBackgroundColor!,
-                ),
-                SummaryCard(
-                  title: 'Active Users',
-                  value: '239K',
-                  percentage: '+6.08%',
-                  isPositive: true,
-                  backgroundColor: appColors.cardBackgroundColor2!,
-                ),
-              ];
-
-              if (constraints.maxWidth < breakpoint) {
-                return Wrap(spacing: 20.0, runSpacing: 20.0, children: cards);
-              } else {
-                return Row(
-                  children: cards.map((card) {
-                    return Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: card,
-                      ),
-                    );
-                  }).toList(),
-                );
-              }
-            },
-          ),
-          const SizedBox(height: 30),
-          Text(
-            'Pending Requests',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 20),
-          const Expanded(child: RequestsGrid()),
-        ],
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // This is the new responsive header
+            AppHeader(),
+            const SizedBox(height: 30),
+      
+            Text(
+              'Dashboard',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Dashboard / Customers\' List',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey),
+            ),
+            const SizedBox(height: 30),
+            // Responsive Summary Cards
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const double breakpoint = 900.0;
+      
+                final List<Widget> cards = [
+                  SummaryCard(
+                    title: 'Total Users',
+                    value: '721K',
+                    percentage: '+11.01%',
+                    isPositive: true,
+                    backgroundColor: appColors.cardBackgroundColor!,
+                  ),
+                  SummaryCard(
+                    title: 'Active Users',
+                    value: '367K',
+                    percentage: '-0.03%',
+                    isPositive: false,
+                    backgroundColor: appColors.cardBackgroundColor2!,
+                  ),
+                  SummaryCard(
+                    title: 'Total Posts',
+                    value: '1,156',
+                    percentage: '+15.03%',
+                    isPositive: true,
+                    backgroundColor: appColors.cardBackgroundColor!,
+                  ),
+                  SummaryCard(
+                    title: 'Pending Posts',
+                    value: '239K',
+                    percentage: '+6.08%',
+                    isPositive: true,
+                    backgroundColor: appColors.cardBackgroundColor2!,
+                  ),
+                ];
+      
+                if (constraints.maxWidth < breakpoint) {
+                  return Wrap(spacing: 20.0, runSpacing: 20.0, children: cards);
+                } else {
+                  return Row(
+                    children: cards.map((card) {
+                      return Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: card,
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'Pending Requests',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 20),
+            // const Expanded(child: RequestsGrid()),
+            const SizedBox(
+              height: 520, // A fixed height for the grid
+              child: RequestsGrid(),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -171,8 +178,6 @@ class SummaryCard extends StatelessWidget {
     );
   }
 }
-
-
 
 class RequestsGrid extends StatefulWidget {
   const RequestsGrid({super.key});
@@ -324,7 +329,11 @@ class _RequestsGridState extends State<RequestsGrid> {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(rendererContext.cell.value, overflow: TextOverflow.ellipsis, maxLines: 1),
+                child: Text(
+                  rendererContext.cell.value,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
               ),
             ],
           );
@@ -364,7 +373,6 @@ class _RequestsGridState extends State<RequestsGrid> {
       ),
     ];
   }
-
 
   // List<PlutoColumn> columns = [
   //   PlutoColumn(
@@ -478,7 +486,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardContent(),
     UserManagementScreen(),
-    ContentPage(title: 'Analytics'),
     PostManagementScreen(),
     ContentPage(title: 'Messages'),
     ContentPage(title: 'Settings'),
@@ -531,14 +538,36 @@ class SideMenu extends StatelessWidget {
             // 1. Brand Title
             Padding(
               padding: const EdgeInsetsDirectional.only(top: 20.0, bottom: 30.0, start: 5),
-              child: Text(
-                'Brand.',
-                style: TextStyle(
-                  // Color is now from the theme.
-                  color: appColors.brandColor,
-                  fontSize: 28,
-                  // fontWeight: FontWeight.bold,
-                ),
+              // child: Text(
+              //   'Brand.',
+              //   style: TextStyle(
+              //     // Color is now from the theme.
+              //     color: appColors.brandColor,
+              //     fontSize: 28,
+              //     // fontWeight: FontWeight.bold,
+              //   ),
+              // ),
+              child: Column(
+                children: [
+                  ClipRRect(
+                    child: SvgPicture.asset(
+                      "images/splash_green.svg",
+                      semanticsLabel: "Your crop icon",
+                      width: 140,
+                      height: 140,
+                    ),
+                  ),
+
+                  // Text(
+                  //   'Your Crop',
+                  //   style: TextStyle(
+                  //     // Color is now from the theme.
+                  //     color: appColors.brandColor,
+                  //     fontSize: 26,
+                  //     // fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                ],
               ),
             ),
 
@@ -559,17 +588,10 @@ class SideMenu extends StatelessWidget {
             ),
             _buildMenuItem(
               context: context,
-              icon: Icons.analytics_outlined,
-              text: 'ANALYTICS',
-              isActive: selectedIndex == 2,
-              onTap: () => onItemTapped(2),
-            ),
-            _buildMenuItem(
-              context: context,
               icon: Icons.access_time_rounded,
               text: 'POSTS',
-              isActive: selectedIndex == 3,
-              onTap: () => onItemTapped(3),
+              isActive: selectedIndex == 2,
+              onTap: () => onItemTapped(2),
             ),
 
             // A spacer between the two sections.
@@ -594,22 +616,22 @@ class SideMenu extends StatelessWidget {
               context: context,
               icon: Icons.email_outlined,
               text: 'MESSAGES',
-              isActive: selectedIndex == 4,
-              onTap: () => onItemTapped(4),
+              isActive: selectedIndex == 3,
+              onTap: () => onItemTapped(3),
             ),
             _buildMenuItem(
               context: context,
               icon: Icons.settings_outlined,
               text: 'SETTINGS',
-              isActive: selectedIndex == 5,
-              onTap: () => onItemTapped(5),
+              isActive: selectedIndex == 4,
+              onTap: () => onItemTapped(4),
             ),
             _buildMenuItem(
               context: context,
               icon: Icons.help_outline_rounded,
               text: 'HELP CENTRE',
-              isActive: selectedIndex == 6,
-              onTap: () => onItemTapped(6),
+              isActive: selectedIndex == 5,
+              onTap: () => onItemTapped(5),
             ),
           ],
         ),

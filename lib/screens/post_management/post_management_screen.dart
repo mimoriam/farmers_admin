@@ -308,6 +308,21 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
     ),
   ];
 
+  final OutlineInputBorder _inputBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8.0),
+    borderSide: BorderSide(color: Colors.grey.shade400),
+  );
+  final OutlineInputBorder _focusedInputBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8.0),
+    borderSide: const BorderSide(color: Colors.grey, width: 2.0),
+  );
+  final OutlineInputBorder _errorInputBorder = OutlineInputBorder(
+    borderRadius: BorderRadius.circular(8.0),
+    borderSide: const BorderSide(color: Colors.red, width: 1.0),
+  );
+
+  final EdgeInsets _contentPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+
   @override
   Widget build(BuildContext context) {
     final appColors = Theme.of(context).extension<AppColors>()!;
@@ -337,18 +352,24 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
                   decoration: InputDecoration(
                     hintText: 'Search Post using post code e.g #12345...',
                     prefixIcon: const Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: appColors.formFieldBorderColor!),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: appColors.brandColor!),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(color: appColors.formFieldBorderColor!),
-                    ),
+                    // border: OutlineInputBorder(
+                    //   borderRadius: BorderRadius.circular(8),
+                    //   borderSide: BorderSide(color: appColors.formFieldBorderColor!),
+                    // ),
+                    // focusedBorder: OutlineInputBorder(
+                    //   borderRadius: BorderRadius.circular(8),
+                    //   borderSide: BorderSide(color: appColors.brandColor!),
+                    // ),
+                    // enabledBorder: OutlineInputBorder(
+                    //   borderRadius: BorderRadius.circular(8),
+                    //   borderSide: BorderSide(color: appColors.formFieldBorderColor!),
+                    // ),
+                    border: _inputBorder,
+                    enabledBorder: _inputBorder,
+                    focusedBorder: _focusedInputBorder,
+                    errorBorder: _errorInputBorder,
+                    focusedErrorBorder: _focusedInputBorder,
+                    contentPadding: _contentPadding,
                   ),
                 ),
               ),
