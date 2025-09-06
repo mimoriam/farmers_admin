@@ -551,7 +551,7 @@ class SideMenu extends StatelessWidget {
                 children: [
                   ClipRRect(
                     child: SvgPicture.asset(
-                      "images/splash_green.svg",
+                      "images/splash_green_2.svg",
                       semanticsLabel: "Your crop icon",
                       width: 140,
                       height: 140,
