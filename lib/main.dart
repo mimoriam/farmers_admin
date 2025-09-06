@@ -1,7 +1,12 @@
 import 'package:farmers_admin/constants/constants.dart';
 import 'package:farmers_admin/screens/dashboard/dashboard.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'auth/auth_screen.dart';
+import 'firebase_options.dart';
 
 @immutable
 class AppColors extends ThemeExtension<AppColors> {
@@ -71,7 +76,11 @@ class AppColors extends ThemeExtension<AppColors> {
   }
 }
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -125,7 +134,32 @@ class MyApp extends StatelessWidget {
       theme: _lightTheme,      // Set the light theme as the default
       // darkTheme: _darkTheme,   // Set the dark theme
       // themeMode: ThemeMode.system, // Automatically switch based on system settings
-      home: DashboardScreen(),
+      // home: DashboardScreen(),
+      home: const AuthWrapper(),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        if (snapshot.hasData) {
+          return const DashboardScreen();
+        }
+        return const AuthScreen();
+      },
     );
   }
 }
