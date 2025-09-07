@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'package:farmers_admin/common/app_header.dart';
+import 'package:farmers_admin/models/post_model.dart';
 import 'package:farmers_admin/screens/edit_post/edit_post_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pluto_grid/pluto_grid.dart';
-
-import '../../main.dart';
 
 class PostManagementScreen extends StatefulWidget {
   const PostManagementScreen({super.key});
@@ -14,399 +14,171 @@ class PostManagementScreen extends StatefulWidget {
 }
 
 class _PostManagementScreenState extends State<PostManagementScreen> {
-  late final PlutoGridStateManager stateManager;
+  late PlutoGridStateManager stateManager;
+  late DatabaseReference _dbRef;
+  List<Post> _posts = [];
+  StreamSubscription<DatabaseEvent>? _postsSubscription;
+  bool _isGridLoaded = false;
 
-  void showDeleteConfirmationDialog(String postId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(Icons.priority_high_rounded, color: Colors.red, size: 40),
-              ),
-              SizedBox(height: 20),
-              Text(
-                "Warning",
-                style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.w600),
-              ),
-              SizedBox(height: 8),
-              Text(
-                "Are you sure you want to delete?",
-                textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600]),
-              ),
-              SizedBox(height: 24),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      icon: Icon(Icons.cancel_outlined, color: Colors.red),
-                      label: Text("Cancel", style: TextStyle(color: Colors.red)),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      icon: Icon(Icons.delete_outline, color: Colors.white),
-                      label: Text("Delete", style: TextStyle(color: Colors.white)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                        padding: EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      onPressed: () async {
-                        if (context.mounted) {
-                          Navigator.of(context).pop();
-                        }
-
-                        if (mounted) {
-                          setState(() {}); // Refresh the list
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  List<PlutoColumn> _getColumns(BuildContext context) {
+  List<PlutoColumn> _getColumns() {
     return [
       PlutoColumn(
-        title: '#',
+        title: 'Post ID',
         field: 'id',
-        type: PlutoColumnType.number(),
-        width: 80,
-        enableSorting: false,
-        textAlign: PlutoColumnTextAlign.center,
-        titleTextAlign: PlutoColumnTextAlign.center,
+        type: PlutoColumnType.text(),
+        readOnly: true,
       ),
-      PlutoColumn(title: 'Post Title', field: 'post_title', type: PlutoColumnType.text()),
       PlutoColumn(
-        title: 'Weight (KG)',
+        title: 'Post Title',
+        field: 'post_title',
+        type: PlutoColumnType.text(),
+        readOnly: true,
+      ),
+      PlutoColumn(
+        title: 'Weight',
         field: 'weight',
-        type: PlutoColumnType.number(),
-        textAlign: PlutoColumnTextAlign.center,
-        titleTextAlign: PlutoColumnTextAlign.center,
+        type: PlutoColumnType.text(),
+        readOnly: true,
       ),
       PlutoColumn(
         title: 'Gender',
         field: 'gender',
         type: PlutoColumnType.text(),
-        textAlign: PlutoColumnTextAlign.center,
-        titleTextAlign: PlutoColumnTextAlign.center,
+        readOnly: true,
       ),
-      PlutoColumn(title: 'City', field: 'city', type: PlutoColumnType.text()),
       PlutoColumn(
-        title: 'Status',
-        field: 'status',
+        title: 'City',
+        field: 'city',
         type: PlutoColumnType.text(),
-        minWidth: 115,
-        renderer: (rendererContext) {
-          Color statusColor;
-          switch (rendererContext.cell.value) {
-            case 'Approved':
-              statusColor = Colors.green;
-              break;
-            case 'Blocked':
-              statusColor = Colors.black;
-              break;
-            case 'Rejected':
-              statusColor = Colors.red;
-              break;
-            default:
-              statusColor = Colors.grey;
-          }
-          return Row(
-            children: [
-              Container(
-                width: 8,
-                height: 8,
-                decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  rendererContext.cell.value,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                ),
-              ),
-            ],
-          );
-        },
+        readOnly: true,
+      ),
+      PlutoColumn(
+        title: 'Village',
+        field: 'village',
+        type: PlutoColumnType.text(),
+        readOnly: true,
+      ),
+      PlutoColumn(
+        title: 'Verified',
+        field: 'verified',
+        type: PlutoColumnType.text(),
+        readOnly: true,
       ),
       PlutoColumn(
         title: 'Actions',
         field: 'actions',
         type: PlutoColumnType.text(),
-        width: 150,
-        minWidth: 150,
-        enableSorting: false,
-        textAlign: PlutoColumnTextAlign.center,
-        titleTextAlign: PlutoColumnTextAlign.center,
+        readOnly: true,
         renderer: (rendererContext) {
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.open_in_new, size: 20),
-                onPressed: () {
-                  Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute(builder: (context) => const EditPostScreen()));
-                },
-                splashRadius: 20,
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, size: 20),
-                onPressed: () {
-                  showDeleteConfirmationDialog("1");
-                },
-                splashRadius: 20,
-              ),
-            ],
+          return IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              final postId = rendererContext.row.cells['id']!.value;
+              try {
+                final post = _posts.firstWhere((p) => p.postId == postId);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditPostScreen(post: post),
+                  ),
+                );
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Error: Could not find post with ID $postId')),
+                  );
+                }
+              }
+            },
           );
         },
       ),
     ];
   }
 
-  final List<PlutoRow> rows = [
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 1),
-        'post_title': PlutoCell(value: 'Alyvia Kelley'),
-        'weight': PlutoCell(value: 21.5),
-        'gender': PlutoCell(value: '(Male) 46y'),
-        'city': PlutoCell(value: 'Toledo'),
-        'status': PlutoCell(value: 'Approved'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 2),
-        'post_title': PlutoCell(value: 'Jaiden Nixon'),
-        'weight': PlutoCell(value: 21.5),
-        'gender': PlutoCell(value: '(Female) 23y'),
-        'city': PlutoCell(value: 'Austin'),
-        'status': PlutoCell(value: 'Approved'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 3),
-        'post_title': PlutoCell(value: 'Ace Foley'),
-        'weight': PlutoCell(value: 36.3),
-        'gender': PlutoCell(value: '(Male) 24y'),
-        'city': PlutoCell(value: 'Fairfield'),
-        'status': PlutoCell(value: 'Blocked'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 4),
-        'post_title': PlutoCell(value: 'Nikolai Schmidt'),
-        'weight': PlutoCell(value: 19.3),
-        'gender': PlutoCell(value: '(Female) 19y'),
-        'city': PlutoCell(value: 'Fairfield'),
-        'status': PlutoCell(value: 'Rejected'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 5),
-        'post_title': PlutoCell(value: 'Clayton Charles'),
-        'weight': PlutoCell(value: 21.5),
-        'gender': PlutoCell(value: '(Female) 5y'),
-        'city': PlutoCell(value: 'Toledo'),
-        'status': PlutoCell(value: 'Approved'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 6),
-        'post_title': PlutoCell(value: 'Prince Chen'),
-        'weight': PlutoCell(value: 18.2),
-        'gender': PlutoCell(value: '(Male) 10y'),
-        'city': PlutoCell(value: 'Orange'),
-        'status': PlutoCell(value: 'Approved'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 7),
-        'post_title': PlutoCell(value: 'Reece Duran'),
-        'weight': PlutoCell(value: 18.2),
-        'gender': PlutoCell(value: '(Male) 65y'),
-        'city': PlutoCell(value: 'Naperville'),
-        'status': PlutoCell(value: 'Approved'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 8),
-        'post_title': PlutoCell(value: 'Anastasia Mcdaniel'),
-        'weight': PlutoCell(value: 21.5),
-        'gender': PlutoCell(value: '(Female) 60y'),
-        'city': PlutoCell(value: 'Orange'),
-        'status': PlutoCell(value: 'Rejected'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 9),
-        'post_title': PlutoCell(value: 'Melvin Boyle'),
-        'weight': PlutoCell(value: 19.3),
-        'gender': PlutoCell(value: '(Male) 18y'),
-        'city': PlutoCell(value: 'Toledo'),
-        'status': PlutoCell(value: 'Blocked'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-    PlutoRow(
-      cells: {
-        'id': PlutoCell(value: 10),
-        'post_title': PlutoCell(value: 'Kailee Thomas'),
-        'weight': PlutoCell(value: 34.1),
-        'gender': PlutoCell(value: '(Male) 33y'),
-        'city': PlutoCell(value: 'Pembroke Pines'),
-        'status': PlutoCell(value: 'Blocked'),
-        'actions': PlutoCell(value: ''),
-      },
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _dbRef = FirebaseDatabase.instance.ref().child('productsPostData');
+    _listenForPosts();
+  }
 
-  final OutlineInputBorder _inputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8.0),
-    borderSide: BorderSide(color: Colors.grey.shade400),
-  );
-  final OutlineInputBorder _focusedInputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8.0),
-    borderSide: const BorderSide(color: Colors.grey, width: 2.0),
-  );
-  final OutlineInputBorder _errorInputBorder = OutlineInputBorder(
-    borderRadius: BorderRadius.circular(8.0),
-    borderSide: const BorderSide(color: Colors.red, width: 1.0),
-  );
+  void _listenForPosts() {
+    _postsSubscription = _dbRef.onValue.listen((DatabaseEvent event) {
+      if (event.snapshot.value != null && mounted) {
+        final data = Map<String, dynamic>.from(event.snapshot.value as Map);
+        final List<Post> loadedPosts = [];
+        data.forEach((key, value) {
+          value.forEach((key, value) {
+            if (value is Map) {
+              final postMap = Map<dynamic, dynamic>.from(value);
+              print(postMap);
+              loadedPosts.add(Post.fromMap(key, postMap));
+            }
+          });
+        });
 
-  final EdgeInsets _contentPadding = const EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+        setState(() {
+          _posts = loadedPosts;
+        });
+
+        if (_isGridLoaded) {
+          _updatePlutoGridRows();
+        }
+      }
+    });
+  }
+
+  void _updatePlutoGridRows() {
+    final newRows = _posts.map((post) {
+      return PlutoRow(
+        cells: {
+          'id': PlutoCell(value: post.postId),
+          'post_title': PlutoCell(value: post.postTitle),
+          'weight': PlutoCell(value: post.displayWeight),
+          'gender': PlutoCell(value: post.postGender),
+          'city': PlutoCell(value: post.postCity),
+          'village': PlutoCell(value: post.postVillage),
+          'verified': PlutoCell(value: post.postUserVerified ? 'Yes' : 'No'),
+          'actions': PlutoCell(value: ''),
+        },
+      );
+    }).toList();
+
+    stateManager.removeAllRows();
+    stateManager.appendRows(newRows);
+  }
+
+  @override
+  void dispose() {
+    _postsSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final appColors = Theme.of(context).extension<AppColors>()!;
-    return Padding(
-      padding: const EdgeInsets.all(30),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return Scaffold(
+      body: Column(
         children: [
           const AppHeader(),
-          const SizedBox(height: 30),
-          Text(
-            'Post Management',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineLarge?.copyWith(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Dashboard / Post Management',
-            style: Theme.of(context).textTheme.titleSmall?.copyWith(color: Colors.grey),
-          ),
-          const SizedBox(height: 30),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search Post using post code e.g #12345...',
-                    prefixIcon: const Icon(Icons.search),
-                    // border: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(8),
-                    //   borderSide: BorderSide(color: appColors.formFieldBorderColor!),
-                    // ),
-                    // focusedBorder: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(8),
-                    //   borderSide: BorderSide(color: appColors.brandColor!),
-                    // ),
-                    // enabledBorder: OutlineInputBorder(
-                    //   borderRadius: BorderRadius.circular(8),
-                    //   borderSide: BorderSide(color: appColors.formFieldBorderColor!),
-                    // ),
-                    border: _inputBorder,
-                    enabledBorder: _inputBorder,
-                    focusedBorder: _focusedInputBorder,
-                    errorBorder: _errorInputBorder,
-                    focusedErrorBorder: _focusedInputBorder,
-                    contentPadding: _contentPadding,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 20),
-              ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: appColors.applyFilterButtonColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                ),
-                child: const Text('SEARCH', style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 30),
           Expanded(
-            child: PlutoGrid(
-              columns: _getColumns(context),
-              rows: rows,
-              onLoaded: (PlutoGridOnLoadedEvent event) {
-                stateManager = event.stateManager;
-                stateManager.setPageSize(10, notify: true);
-              },
-              configuration: PlutoGridConfiguration(
-                columnSize: const PlutoGridColumnSizeConfig(autoSizeMode: PlutoAutoSizeMode.scale),
-                style: PlutoGridStyleConfig(
-                  gridBorderColor: Colors.transparent,
-                  borderColor: appColors.formFieldBorderColor!,
-                  rowColor: Colors.white,
-                  columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-                ),
+            child: Container(
+              padding: const EdgeInsets.all(15),
+              child: PlutoGrid(
+                columns: _getColumns(),
+                rows: const [],
+                onLoaded: (PlutoGridOnLoadedEvent event) {
+                  stateManager = event.stateManager;
+                  stateManager.setShowColumnFilter(true);
+                  setState(() {
+                    _isGridLoaded = true;
+                  });
+                  if(_posts.isNotEmpty){
+                    _updatePlutoGridRows();
+                  }
+                },
+                configuration: const PlutoGridConfiguration(),
               ),
-              createFooter: (stateManager) {
-                stateManager.setPageSize(10, notify: true);
-                return PlutoPagination(stateManager);
-              },
             ),
           ),
         ],
@@ -414,3 +186,4 @@ class _PostManagementScreenState extends State<PostManagementScreen> {
     );
   }
 }
+
