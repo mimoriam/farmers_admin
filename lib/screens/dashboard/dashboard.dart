@@ -40,7 +40,7 @@ class DashboardContent extends StatelessWidget {
             // This is the new responsive header
             AppHeader(),
             const SizedBox(height: 30),
-      
+
             Text(
               'Dashboard',
               style: Theme.of(
@@ -57,7 +57,7 @@ class DashboardContent extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 const double breakpoint = 900.0;
-      
+
                 final List<Widget> cards = [
                   SummaryCard(
                     title: 'Total Users',
@@ -88,7 +88,7 @@ class DashboardContent extends StatelessWidget {
                     backgroundColor: appColors.cardBackgroundColor2!,
                   ),
                 ];
-      
+
                 if (constraints.maxWidth < breakpoint) {
                   return Wrap(spacing: 20.0, runSpacing: 20.0, children: cards);
                 } else {
@@ -485,7 +485,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardContent(),
-    UserManagementScreen(),
+    // UserManagementScreen(),
+    UserScreen(),
     PostManagementScreen(),
     ContentPage(title: 'Messages'),
     ContentPage(title: 'Settings'),
